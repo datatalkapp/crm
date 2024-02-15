@@ -1,0 +1,14 @@
+instance
+uploads
+migrations
+*.pyc
+.env
+sample_data
+__pycache__
+data/*
+!.placeholder
+
+.DS_Store
+fly.toml
+demo_data
+demo_test

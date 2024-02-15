@@ -1,0 +1,280 @@
+{% import 'macros.html' as macros %}
+<div id="table">
+    <style>
+        .htmx-settling img {
+            opacity: 0;
+        }
+
+        img {
+            transition: opacity 300ms ease-in;
+        }
+    </style>
+    <div>
+        <div class="buttons">
+            <a class="btn btn-primary" title="Press A" href="{{ url_for(object_name+'_new') }}">{{ macros.icon('plus')
+                }}</a>
+            <a hx-boost="false" class="btn btn-primary" href="{{ url_for('download_csv', object_name=object_name) }}">{{
+                macros.icon('download') }}</a>
+        </div>
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th></th>
+                        {% for column in columns %}
+                        <th>{{ macros.icon(column) }} {{ column | capitalize | replace('_', ' ')}}</th>
+                        {% endfor %}
+                        {% if edit or view or delete %}
+                        <th></th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                {% for obj in objects %}
+                <tr>
+                    <td><input type="checkbox"></td>
+                    {% for column in columns %}
+
+                    {% if loop.index == 1 and view %}
+
+                    {% if obj.__class__.__name__ == 'Tag' %}
+                    <td><a class="badge" style="background-color: #{{ obj.color }}; color: {{ obj.text_color }}"
+                            href="{{ url_for(view, id=obj.id)}}">{{ obj[column] }}</a></td>
+                    
+                            {% elif obj.__class__.__name__ == 'File' %}
+                    <td>{{ macros.render_file_link(obj) }}</td>
+                    {% elif obj.__class__.__name__ == 'User' %}
+                    <td>{{ macros.render_user_link(obj) }}</td>
+                    {% elif obj.__class__.__name__ == 'Company' %}
+                    <td>{{ macros.render_company_link(obj) }}</td>
+                    {% elif obj.__class__.__name__ == 'Contact' %}
+                    <td>{{ macros.render_contact_link(obj) }}</td>
+                    {% else %}
+                    <td>{% if obj[column] %}<a href="{{ url_for(view, id=obj.id)}}">{{ obj[column] | truncate(50) }}</a>{% endif %}</td>
+                    {% endif %}
+
+                    {% elif column == 'value' %}
+                    <td>{{ obj[column] | currency }}</td>
+
+                    {% elif column == 'size' %}
+                    <td>{{ obj[column] | human_readable_size }}</td>
+
+                    {% elif is_date(obj[column]) %}
+                    <td>{{ obj[column] | date }}</td>
+
+                    {% elif is_file(obj[column]) %}
+                    <td><a href="{{ url_for('document', id=obj[column].id)}}">{{ obj[column].filename }}</a></td>
+
+                    {% elif is_user(obj[column]) %}
+                    <td>{{ macros.render_user_link(obj[column]) }}</td>
+
+                    {% elif is_company(obj[column]) %}
+                    <td>{{ macros.render_company_link(obj[column]) }}</td>
+
+                    {% elif is_contact(obj[column]) %}
+                    <td>{{ macros.render_contact_link(obj[column]) }}</td>
+
+                    {% elif are_tags(obj[column]) %}
+                    <td>
+                        {% for tag in obj[column] %}
+                        <span class="badge" style="background-color: #{{ tag.color }}; color: {{ tag.text_color }}">{{
+                            tag.name
+                            }}</span>
+                        {% endfor %}
+                    </td>
+
+                    {% elif column == 'status' and obj.__class__.__name__ == 'File' %}
+                    <td>
+                        {% if obj[column] == 'processing' %}
+                        <div hx-get="{{ url_for('document_status', id=obj.id) }}" hx-trigger="every 2s">
+
+                            <style>
+                                .progress-container {
+                                    width: 100%;
+
+                                    background-color: {
+                                            {
+                                            theme['background_color']
+                                        }
+                                    }
+
+                                    ;
+                                }
+
+                                .progress-bar {
+                                    width: 0;
+                                    height: 20px;
+
+                                    background-color: {
+                                            {
+                                            theme['text_color']
+                                        }
+                                    }
+
+                                    ;
+                                    animation: progress 1s ease-out;
+                                }
+
+                                @keyframes progress {
+                                    from {
+                                        width: 0;
+                                    }
+
+                                    to {
+                                        width: 100%;
+                                    }
+                                }
+                            </style>
+                            <div class="progress-container">
+                                <div class="progress-bar"></div>
+                            </div>
+
+                        </div>
+                        {% else %}
+                        {{ obj[column] }}
+                        {% endif %}
+                    </td>
+
+                    {% elif column == 'email' %}
+                    <td>{% if obj[column] %}{{ macros.render_email_link(obj[column]) }}{% endif %}</td>
+
+                    {% elif column == 'phone' %}
+                    <td>{% if obj[column] %}{{ macros.render_phone_link(obj[column]) }}{% endif %}</td>
+
+                    {% elif column == 'url' %}
+                    <td>{% if obj[column] %}<a href="{{ obj[column] }}">{{ obj[column] }}</a>{% endif %}</td>
+
+
+                    {% elif is_contact(obj[column]) %}
+                    <td><a href="{{ url_for('contacts_view', id=obj[column].id)}}">{{ obj[column].name }}</a></td>
+                    {% else %}
+                    <td>{{ obj[column] }}</td>
+                    {% endif %}
+
+                    {% endfor %}
+                    <td>
+                        {% if edit %}
+                        <a href="{{ url_for(edit, id=obj.id) }}" class="btn btn-primary btn-sm">{{ macros.icon('edit')
+                            }}</a>
+                        {% endif %}
+                        <button href="#"  hx-target="closest tr" hx-delete="{{ url_for('delete_object', object_name=object_name, id=obj.id) }}" class="btn btn-primary btn-sm"
+                            hx-confirm="Are you sure?">{{ macros.icon('delete')
+                            }}</button>
+                            <a href="{{ url_for('chat_object', object_name=object, id=obj.id) }}" class="btn btn-primary btn-sm">{{ macros.icon('chat')
+                            }}</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <script>
+            let currentRow = -1;
+            let currentCol = 0;
+            const ARROW_KEYS = { left: 37, up: 38, right: 39, down: 40 };
+
+            document.addEventListener('keydown', function (event) {
+                // check if arrow key pressed
+                if (event.keyCode === 13) { // 13 is the key code for Enter
+                    // Find the focused <td> element
+                    const focusedCell = document.querySelector('td.focus');
+
+                    if (focusedCell) {
+                        // Find the <a> tag inside the focused cell
+                        const link = focusedCell.querySelector('a');
+                        if (link) {
+                            // If an <a> tag is found, follow the link
+                            window.location.href = link.href;
+                        }
+                    }
+                }
+
+                if (![37, 38, 39, 40].includes(event.keyCode)) {
+                    return;
+                }
+
+                // prevent default
+                event.preventDefault();
+
+                // Define key codes for arrow keys
+
+                // Select the first table
+                const table = document.querySelector('table');
+                const cells = table.querySelectorAll('td');
+
+                // return if no table
+                if (!table) {
+                    return;
+                }
+
+                // Calculate row and column count
+                const rowCount = table.rows.length;
+                const colCount = table.rows[0].cells.length;
+
+                // Determine the new cell based on the arrow key pressed
+                switch (event.keyCode) {
+                    case ARROW_KEYS.right:
+                        currentCol = (currentCol + 1) % colCount;
+                        break;
+                    case ARROW_KEYS.left:
+                        currentCol = (currentCol - 1 + colCount) % colCount;
+                        break;
+                    case ARROW_KEYS.down:
+                        currentRow = (currentRow + 1) % rowCount;
+                        break;
+                    case ARROW_KEYS.up:
+                        currentRow = (currentRow - 1 + rowCount) % rowCount;
+                        break;
+                }
+
+                // Ensure the row and column are within the table's bounds
+                currentRow = Math.max(0, Math.min(currentRow, rowCount - 1));
+                currentCol = Math.max(0, Math.min(currentCol, colCount - 1));
+
+                // remove focus class from other elemnent
+                const focusedElement = document.querySelector('.focus');
+                if (focusedElement) {
+                    focusedElement.classList.remove('focus');
+                }
+
+                // Calculate the index of the new cell and focus it
+                let newIndex = currentRow * colCount + currentCol;
+                cells[newIndex].focus();
+
+                // apply 'focus' class style
+                cells[newIndex].classList.add('focus');
+
+                // Scroll to the new cell
+                cells[newIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+            });
+        </script>
+    </div>
+
+    {% if pagination.pages > 1 %}
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            {% if pagination.has_prev %}
+            <li class="page-item"><a class="page-link" hx-target="#table" hx-swap="outerHTML"
+                    href="{{ url_for('view_table', object_name=object_name, page=pagination.prev_num) }}"><</a>
+            </li>
+            {% endif %}
+            <!-- Dynamically generate page numbers if needed -->
+            {% for page_num in pagination.iter_pages() %}
+            {% if page_num %}
+            {% if page_num != pagination.page %}
+            <li class="page-item"><a class="page-link" hx-target="#table" hx-swap="outerHTML"
+                    href="{{ url_for('view_table', object_name=object_name, page=page_num) }}">{{ page_num }}</a></li>
+            {% else %}
+            <li class="page-item active"><span class="page-link">{{ page_num }}</span></li>
+            {% endif %}
+            {% else %}
+            <li class="page-item disabled"><span class="page-link">...</span></li>
+            {% endif %}
+            {% endfor %}
+            {% if pagination.has_next %}
+            <li class="page-item"><a class="page-link" hx-target="#table" hx-swap="outerHTML"
+                    href="{{ url_for('view_table', object_name=object_name, page=pagination.next_num) }}">></a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>

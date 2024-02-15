@@ -1,0 +1,151 @@
+<style>
+
+    ::-webkit-scrollbar {
+        width: 12px; /* width of the entire scrollbar */
+    }
+
+    ::-webkit-scrollbar-track {
+        background: {{ theme['pane_color']}}; /* color of the tracking area */
+    }
+
+    ::-webkit-scrollbar-thumb {
+    background-color: {{ theme['background_color ']}};    /* color of the scroll thumb */
+    border-radius: 6px;       /* roundness of the scroll thumb */
+    border: 2px solid lightgray;  /* creates padding around scroll thumb */
+}
+
+    body {
+        background-color: {{ theme['background_color'] }};
+        color: {{ theme['text_color'] }};
+    }
+
+    .panel {
+        background-color: {{ theme['background_color'] }};
+        h2 {
+            color: {{ theme['text_color_secondary'] }};
+        }
+        a {
+            color: {{ theme['text_color'] }};
+            &:hover {
+                color: {{ theme['background_color'] }};
+                background-color: {{ theme['text_color_secondary'] }};
+            }
+        }
+    }
+
+    .content {
+        .header {
+            background-color: {{ theme['background_color'] }};
+
+            #search {
+                a {
+                    color: {{ theme['text_color'] }};
+                    &:hover {
+                        color: {{ theme['background_color'] }};
+                        background-color: {{ theme['text_color_secondary'] }};
+                    }
+                }
+            }
+
+        }
+        .pane {
+            background-color: {{ theme['pane_color'] }};
+            border-color: {{ theme['border_color'] }};
+        }
+    }
+
+    table {
+        td {
+            border-color: {{ theme['border_color'] }};
+            a {
+                background-color: {{ theme['background_color'] }};
+                color: {{ theme['text_color'] }};
+            }
+            a:hover {
+                color: {{ theme['background_color'] }};
+                background-color: {{ theme['text_color_secondary'] }};
+        }
+        }
+        th {
+            color: {{ theme['text_color'] }};
+        }
+        tbody tr:hover {
+            background-color: {{ theme['background_color'] }}; 
+        }
+    }
+
+    input, textarea, select {
+        background-color: {{ theme['background_color'] }};
+        border-color: {{ theme['border_color'] }};
+        color: {{ theme['text_color'] }};
+    }
+
+    input:focus, textarea:focus, select:focus {
+        outline: none;
+        border-color: {{ theme['text_color'] }};
+    }
+
+    label {
+        color: {{ theme['text_color'] }};
+    }
+
+    .focus {
+        border-color: {{ theme['text_color'] }} !important;
+    }
+
+    .btn {
+        background-color: {{ theme['button_background'] }};
+        color: {{ theme['button_text_color'] }};
+        border-color: {{ theme['border_color'] }};
+        &:hover {
+            background-color: {{ theme['button_hover_background'] }};
+        }
+    }
+
+    .conversation {
+        .introduction {
+            p {
+                color: {{ theme['text_color_secondary'] }};
+            }
+        }
+        .typing {
+            color: {{ theme['text_color_secondary'] }};
+        }
+    }
+
+    .pagination {
+
+        a         {
+        background-color: {{ theme['button_background'] }};
+        color: {{ theme['button_text_color'] }};
+        border-color: {{ theme['border_color'] }};
+        &:hover {
+            background-color: {{ theme['button_hover_background'] }};
+        }
+
+        .active {
+            background-color: {{ theme['button_hover_background'] }};
+            color: {{ theme['button_text_color'] }};
+            border-color: {{ theme['border_color'] }};
+        }
+    }
+    }
+
+    #search-input {
+        background-color: {{ theme['background_color'] }};
+        border-color: {{ theme['border_color'] }};
+        color: {{ theme['text_color'] }};
+    }
+
+    #search-results {
+        background-color: {{ theme['background_color'] }};
+    }
+
+    a {
+        color: {{ theme['text_color'] }};
+        &:hover {
+            color: {{ theme['background_color'] }};
+            background-color: {{ theme['text_color_secondary'] }};
+        }
+    }
+</style>

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block title %}
+{{ macros.icon('contact') }} Contact
+{% endblock %}
+{% block content %}
+<h1 style="display: flex; align-items: center;">
+    <img src="{{ contact.image_url }}" style="border-radius: 50%; margin-right: 20px; max-width: 100px;"> {{ contact.name }}</h1>
+<div class="buttons"><a class="btn btn-primary" href="{{ url_for('contacts_edit', id=contact.id) }}">Edit</a></div>
+
+{{ macros.vertical_table(contact, ['title', 'email', 'phone', 'company']) }}
+
+<h2>Interactions</h2>
+
+
+
+<div hx-get="{{ url_for('timeline') }}" hx-trigger="load">
+    <div style="width: 100%; height: 100vh; display: flex; justify-content: center;">
+        <img class="htmx-indicator" width="150" src=" {{ url_for('static', filename='images/bars.svg' )}}" />
+    </div>
+</div>
+
+
+
+{% endblock %}

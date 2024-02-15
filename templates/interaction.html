@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% block title %}{{ macros.icon('interaction') }} Interaction {% endblock %}
+{% block content %}
+<div class="buttons">
+<a class="btn btn-primary" href="{{ url_for('interactions_edit', id=interaction.id) }}">Edit</a>
+</div>  
+{{ macros.vertical_table(interaction, ['notes_summary_one_line', 'notes_summary', 'notes', 'contact', 'date', 'opportunity', ])}}
+{% endblock %}

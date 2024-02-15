@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataTalk</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="login-page-background">
+    <div class="center-container">
+        <div class="login-box">
+            <form action="{{ url_for('login') }}" method="POST">
+                {{ form.hidden_tag() }}
+                <div class="form-inner">
+                    
+                    <div class="login-logo">DataTalk</div>
+
+                    {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        <div class="flash-messages-container">
+                            {% for message in messages %}
+                            <div class="flash-message">{{ message }}</div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                    {% endwith %}
+
+
+                    {{ form.email.label }}
+                    {{ form.email(class="login-form-input") }}
+            
+                    {{ form.password.label }}
+                    {{ form.password(class="login-form-input") }}
+            
+                    <div class="login-button-container">
+                        {{ form.submit() }}
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
+

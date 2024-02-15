@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% for notification in notifications %}
+<div class="notification">
+    <p>{{ notification.message }}</p>
+    {% if notification.task %}
+    <p>{{ macros.render_task_link(notification.task) }}</p>
+    {% endif %}
+</div>
+{% endfor %}
+{% endblock %}

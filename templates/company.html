@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}
+{{ macros.icon('company') }} Company
+{% endblock %}
+{% block content %}
+<h1 style="display: flex; align-items: center;">
+    <img src="{{ company.image_url }}" style=" margin-right: 20px; max-width: 300px;"> {{ company.name }}</h1>
+<div class="buttons"><a class="btn btn-primary" href="{{ url_for('companies_edit', id=company.id) }}">Edit</a></div>
+
+{{ macros.vertical_table(company, ['website']) }}
+
+<h2>Contacts</h2>
+<div hx-get="{{ url_for('view_table', object_name='contacts', filter_company_id=company.id) }}" hx-trigger="load">
+    <div style="width: 100%; height: 100vh; display: flex; justify-content: center;">
+        <img class="htmx-indicator" width="150" src=" {{ url_for('static', filename='images/bars.svg' )}}" />
+    </div>
+</div>
+
+{% endblock %}

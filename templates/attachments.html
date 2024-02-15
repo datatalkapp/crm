@@ -1,0 +1,9 @@
+{% import "macros.html" as macros %}
+<p><b>Resources:</b></p>
+{% for obj in files %}
+<a target="_blank" href="http://localhost:8080/static/pdfjs/web/viewer.html?file=http://localhost:8080{{ url_for('document', id=obj.id)}}&highlight={{highlighted_text}}">
+    {% if obj.file_type == 'pdf' %}
+    {{ macros.icon('pdf') }}
+    {% endif %}
+    {{ obj.filename }}</a>
+{% endfor %}

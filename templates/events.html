@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}
+{{ macros.icon('events') }}Events
+{% endblock %}
+{% block content %}
+<div hx-get="{{ url_for('events_table') }}" hx-trigger="load">
+    <div style="width: 100%; height: 100vh; display: flex; justify-content: center;">
+        <img class="htmx-indicator" width="150" src=" {{ url_for('static', filename='images/bars.svg' )}}" />
+    </div>
+</div>
+{% endblock %}

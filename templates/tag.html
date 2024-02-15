@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<a class="btn btn-primary" href="{{ url_for('edit_user', id=user.id) }}">Edit</a>
+{{ macros.vertical_table(tag, ['name', 'color']) }}
+{% endblock %}

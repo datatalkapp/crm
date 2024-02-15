@@ -1,0 +1,21 @@
+<div class="message">
+    <div class="col">
+        <i class="la la-user" style="background-color: darkorange"></i>
+    </div>
+    <div class="col">
+        <span class="name">{{ message.sender.name }}</span>
+        <p>{{ message.text }}</p>
+    </div>
+</div>
+<div class="message">
+    <div class="col">
+        <i class="la la-user" style="background-color: darkorange"></i>
+    </div>
+    <div class="col">
+        <span class="name">Assistant</span>
+    </div>
+</div>
+<script>
+    var messages = document.getElementsByClassName('message');
+    messages[messages.length - 1].scrollIntoView();
+</script>

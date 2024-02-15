@@ -1,0 +1,63 @@
+{% import 'macros.html' as macros %}
+<ul>
+{% if not contacts and not companies and not opportunities and not interactions and not tasks and not tags and not users and not files %}
+<li>No results found</li>
+{% endif %}
+{% for contact in contacts %}
+<li>{{ macros.render_contact_link(contact) }}</li>
+{% endfor %}
+{% for company in companies %}
+<li>{{ macros.render_company_link(company) }}</li>
+{% endfor %}
+{% for opportunity in opportunities %}
+<li><a href="{{ url_for('opportunities_view', id=opportunity.id)}}"><i class="la la-user"></i> {{ opportunity.name }}</a></li>
+{% endfor %}
+{% for interaction in interactions %}
+<li><a href="{{ url_for('interactions_view', id=interaction.id)}}"><i class="la la-user"></i> {{ interaction.name }}</a></li>
+{% endfor %}
+{% for task in tasks %}
+<li><a href="{{ url_for('tasks_view', id=task.id)}}"><i class="la la-user"></i> {{ task.name }}</a></li>
+{% endfor %}
+{% for tag in tags %}
+<li><a href="{{ url_for('tags_view', id=tag.id)}}"><i class="la la-tag"></i> {{ tag.name }}</a></li>
+{% endfor %}
+{% for user in users %}
+<li>{{ macros.render_user_link(user) }}</li>
+{% endfor %}
+{% for file_ in files %}
+<li>{{ macros.render_file_link(file_) }}</li>
+{% endfor %}
+</ul>
+
+<script>
+  function highlightSearchTerm(searchTerm) {
+    const searchResults = document.getElementById('search-results');
+    if (!searchResults) return; // Element not found
+
+    // Function to recursively highlight text nodes
+    function highlightNode(node) {
+        if (node.nodeType === 3) { // Text node
+            const regex = new RegExp(`(${searchTerm})`, 'gi');
+            const matches = node.nodeValue.match(regex);
+
+            if (matches) {
+                const highlightedText = node.nodeValue.replace(regex, '<span class="highlight">$1</span>');
+                const wrapper = document.createElement('div');
+                wrapper.innerHTML = highlightedText;
+
+                while (wrapper.firstChild) {
+                    node.parentNode.insertBefore(wrapper.firstChild, node);
+                }
+                node.parentNode.removeChild(node);
+            }
+        } else if (node.nodeType === 1) { // Element node
+            Array.from(node.childNodes).forEach(highlightNode);
+        }
+    }
+
+    highlightNode(searchResults);
+}
+
+highlightSearchTerm('{{ query }}');
+
+</script>

@@ -1,0 +1,26 @@
+<style>
+    .progress-container {
+        width: 100%;
+        background-color: {{ theme['background_color'] }};
+    }
+
+    .progress-bar {
+        width: 0;
+        height: 20px;
+        background-color: {{ theme['text_color'] }};
+        animation: progress 1s ease-out;
+    }
+
+    @keyframes progress {
+        from {
+            width: 0;
+        }
+
+        to {
+            width: 100%;
+        }
+    }
+</style>
+<div class="progress-container">
+    <div class="progress-bar"></div>
+</div>

@@ -1,0 +1,60 @@
+{% import 'macros.html' as macros %}
+<style>
+    .timeline {
+        position: relative;
+        padding-left: 20px;
+        border-left: 2px solid #737373; /* Timeline line */
+      }
+      
+      .event {
+        margin-bottom: 20px;
+      }
+      
+      .event h4 { /* Date styling */
+        margin: 0 0 5px 0;
+      }
+      
+      .event {
+        position: relative; /* Add this line */
+        margin-bottom: 20px;
+        border: grey;
+        background-color: white;
+        padding: 10px;
+        border-radius: 10px;
+      }
+
+      .event h4 {
+        color: grey;
+      }
+      
+      .marker { /* Markers */
+        content: '';
+        position: absolute;
+        left: -40px; /* Adjust based on border thickness */
+        background-color: #fff;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        top: 5px;
+      }
+
+      .marker i {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: #9a9a9a;
+      }
+
+    </style>
+<div class="timeline">
+{% for interaction in interactions %}
+    <div class="event">
+        <p class="marker">{% if interaction.type_ == 'email' %}<i class="la la-envelope"></i>{% elif interaction.type_ == 'call'%}<i class="las la-phone"></i>{% else %}<i class="la la-check"></i>{% endif %}</p>
+      <h4>{{ interaction.date | human_readable_date }}</h4>
+      <p>{{ macros.render_interaction_link(interaction) }}</p>
+      <p style="color: grey;">{{ interaction.notes_summary }}</p>
+    </div>
+{% endfor %}
+</div>
+  

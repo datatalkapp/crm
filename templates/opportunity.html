@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{{ macros.icon('opportunity') }} Opportunity
+{% endblock %}
+{% block content %}
+
+{{ macros.vertical_table(opportunity, ['name'])}}
+{% endblock %}

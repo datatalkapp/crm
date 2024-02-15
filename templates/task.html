@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Task</h2>
+{{ macros.vertical_table(task, ['name', 'assigned_to', 'status'])}}
+{% endblock %}

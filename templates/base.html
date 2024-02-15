@@ -1,0 +1,86 @@
+{% import 'macros.html' as macros %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block window_title %}{% endblock %}DataTalk</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet"
+        href="https://maxst.icons8.com/vue-static/landings/line-awesome/line-awesome/1.3.0/css/line-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/htmx.org@1.9.10"
+        integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.socket.io/4.7.4/socket.io.min.js"
+        integrity="sha384-Gr6Lu2Ajx28mzwyVR8CFkULdCU7kMlZ9UthllibdOSo6qAiN+yXNHqtgdTvFXMT4"
+        crossorigin="anonymous"></script>
+    {% include 'theme.html' %}
+</head>
+<body hx-boost="true">
+    {% if current_user.is_authenticated %}
+    <div class="panel">
+        <div class="logo"><a href="/">DataTalk</a></div>
+        <h2>Sales</h2>
+        <a href="{{ url_for('view_list', object_name='companies') }}"><i class="las la-building"></i>Companies</a>
+        <a href="{{ url_for('view_list', object_name='contacts') }}"><i class="las la-user-friends"></i>Contacts</a>
+        <a href="{{ url_for('view_list', object_name='opportunities') }}"><i class="las la-bullseye"></i>Opportunities</a>
+        <a href="{{ url_for('view_list', object_name='interactions') }}"><i class="las la-handshake"></i>Interactions</a>
+        <h2>Tasks</h2>
+        <a href="{{ url_for('view_list', object_name='tasks') }}"><i class="las la-user-friends"></i>All</a>
+        <h2>Documents</h2>
+        <a href="{{ url_for('assistant_chat', id=99999) }}"><i class="las la-comments"></i>Chat</a>
+        <a href="{{ url_for('documents') }}"><i class="las la-file-alt"></i>Browse</a>
+        <a href="{{ url_for('shared_documents') }}"><i class="las la-share-alt"></i>Shared</a>
+        <br />
+        <br />
+        <br />
+        <a href="{{ url_for('view_list', object_name='tags') }}"><i class="las la-tags"></i>Tags</a>
+        <a href="{{ url_for('notifications') }}"><i class="las la-bell"></i>Notifications</a>
+        <a href="{{ url_for('logout') }}"><i class="las la-sign-out-alt"></i>Logout</a>
+    </div>
+    {% endif %}
+    <div class="content">
+        <div class="header">
+            <div id="search" style="position: relative;">            
+                <input type="search" 
+                        name="query" placeholder="Search" 
+                        hx-post="/search" 
+                        hx-trigger="input changed delay:500ms, search" 
+                        hx-target="#search-results" 
+                        hx-indicator=".search-indicator" id="search-input" style="padding-left: 30px;">
+                <i class="las la-search" style="position: absolute; left: 10px; top: 32px; transform: translateY(-50%); pointer-events: none;"></i>
+                <i class="las la-spinner la-spin search-indicator" style="color: #000; position: absolute; right: 10px; top: 50%; transform: translateY(-50%);"></i>
+            
+                <div id="search-results"></div>
+            </div>
+            <script>
+                document.addEventListener('keydown', function(event) {
+                    // Check if Ctrl+F or Command+F was pressed
+                    if ((event.ctrlKey || event.metaKey) && event.key === 'f') {
+                        event.preventDefault();
+                        var searchInput = document.getElementById('search-input')
+                        searchInput.focus();
+                    }
+                });
+            </script>
+            
+            
+        </div>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-primary" role="alert">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+        <div class="pane">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
+</body>
+</html>

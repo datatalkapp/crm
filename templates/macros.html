@@ -1,0 +1,230 @@
+{% macro render_field(field) %}
+<div class="mb-3">
+    {% if field.type == "SubmitField" %}
+    {{ field(class_='form-control btn btn-primary', **kwargs)|safe }}
+    {% elif field.type == "CSRFTokenField" %}
+    {{ field(style="display: none;") }}
+    {% elif field.type == "TextAreaField" %}
+    <div class="input">
+        {{ field(class_='form-control', rows=10, style="height: 300px;", **kwargs)|safe }}
+        {{ field.label(class_='form-label') }}
+    </div>
+    {% elif field.type == 'BooleanField' %}
+    <div class="form-check">
+        {{ field(class_='form-check-input', **kwargs)|safe }}
+        {{ field.label(class_='form-check-label') }}
+    </div>
+    {% else %}
+    <div class="input">
+        {{ field(**kwargs)|safe }}
+        {{ field.label() }}
+    </div>
+    {% endif %}
+    {% if field.errors %}
+    <div class="invalid-feedback d-block">
+        {% for error in field.errors %}
+        <p>{{ error }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{% macro render_user_link(user) %}
+<div class="user-link-div"><a href="{{ url_for('users_view', id=user.id)}}" class="user-link"><div class="image-icon-user" style="background-image: url('{{ user.image_url}}');"></div><span class="user-name">{{ user.name }}</span></a></div>
+{% endmacro %}
+
+{% macro render_company_link(company) %}
+<a href="{{ url_for('companies_view', id=company.id)}}" class="company-link"><div class="image-icon-company" style="background-image: url('{{ company.image_url}}');"></div><span class="company-name">{{ company.name }}</span></a>
+{% endmacro %}
+
+{% macro render_contact_link(contact) %}
+<a href="{{ url_for('contacts_view', id=contact.id)}}" class="contact-link"><div class="image-icon-contact" style="background-image: url('{{ contact.image_url}}');"></div><span class="contact-name">{{ contact.name }}</span></a>
+{% endmacro %}
+
+{% macro render_email_link(email_address) %}
+<a href="mailto:{{ email_address }}">{{ email_address }}</a>
+{% endmacro %}
+
+{% macro render_phone_link(phone_number) %}
+<a href="tel:{{ phone_number }}">{{ phone_number | phone }}</a>
+{% endmacro %}
+
+{% macro render_file_link(file_) %}
+<a target="_blank" href="{{ url_for('document', id=file_.id)}}">
+    {% if file_.file_type == 'pdf' %}
+    {{ icon('pdf') }}
+    {% endif %}
+    {{ file_.filename }}</a>
+{% endmacro %}
+
+{% macro render_task_link(task) %}
+<a href="{{ url_for('tasks_view', id=task.id)}}" class="task-link">
+{% endmacro %}
+
+{% macro render_interaction_link(interaction) %}
+<a href="{{ url_for('interactions_view', id=interaction.id)}}" class="interaction-link">
+<span class="interaction-name">{{ interaction.notes_summary_one_line }}</span>
+</a>
+{% endmacro %}
+
+{% macro render_form(form) %}
+<form id="form" method="{% if id %}put{% else %}post{% endif %}" action="{{ kwargs.get('action', '') }}" enctype="multipart/form-data">
+    {% for field in form %}
+    {{ render_field(field) }}
+    {% endfor %}
+</form>
+<script>
+    window.onload = function () {
+        var form = document.getElementById('form');
+        if (form) {
+            var firstInput = form.querySelector('input, select, textarea');
+            if (firstInput) {
+                firstInput.focus();
+            }
+        }
+    };
+</script>
+{% endmacro %}
+
+
+{% macro icon(name) %}
+{% if name == 'name' %}
+<i class="las la-user"></i>
+{% elif name == 'chat' %}
+<i class="las la-comment"></i>
+{% elif name =='email' %}
+<i class="las la-envelope"></i>
+{% elif name == 'phone' %}
+<i class="las la-phone"></i>
+{% elif name == 'address' %}
+<i class="las la-map-marker"></i>
+{% elif name == 'date' %}
+<i class="las la-calendar"></i>
+{% elif name == 'value' %}
+<i class="las la-dollar-sign"></i>
+{% elif name == 'contact' %}
+<i class="las la-user-friends"></i>
+{% elif name == 'interaction' %}
+<i class="las la-handshake"></i>
+{% elif name == 'opportunity' %}
+<i class="las la-bullseye"></i>
+{% elif name == 'task' %}
+<i class="las la-tasks"></i>
+{% elif name == 'company' %}
+<i class="las la-building"></i>
+{% elif name == 'actions' %}
+<i class="las la-cog"></i>
+{% elif name == 'download' %}
+<i class="las la-download"></i>
+{% elif name == 'plus' %}
+<i class="las la-plus"></i>
+{% elif name == 'edit' %}
+<i class="las la-edit"></i>
+{% elif name == 'delete' %}
+<i class="las la-trash"></i>
+{% elif name == 'view' %}
+<i class="las la-eye"></i>
+{% elif name == 'due_date' %}
+<i class="las la-calendar"></i>
+{% elif name == 'notes' %}
+<i class="las la-sticky-note"></i>
+{% elif name == 'notes_summary_one_line' %}
+<i class="las la-sticky-note"></i>
+{% elif name == 'notes_summary' %}
+<i class="las la-sticky-note"></i>
+{% elif name == 'status' %}
+<i class="las la-check"></i>
+{% elif name == 'assigned_to' %}
+<i class="las la-user"></i>
+{% elif name == 'priority' %}
+<i class="las la-exclamation-triangle"></i>
+{% elif name == 'contacts' %}
+<i class="las la-user-friends"></i>
+{% elif name == 'interactions' %}
+<i class="las la-handshake"></i>
+{% elif name == 'opportunities' %}
+<i class="las la-bullseye"></i>
+{% elif name == 'tasks' %}
+<i class="las la-tasks"></i>
+{% elif name == 'notifications' %}
+<i class="las la-bell"></i>
+{% elif name == 'tags' %}
+<i class="las la-tags"></i>
+{% elif name == 'created_at' %}
+<i class="las la-calendar"></i>
+{% elif name == 'updated_at' %}
+<i class="las la-calendar"></i>
+{% elif name == 'comment' %}
+<i class="las la-comment"></i>
+{% elif name == 'comments' %}
+<i class="las la-comment"></i>
+{% elif name == 'uid' %}
+<i class="las la-hashtag"></i>
+{% elif name == 'url' %}
+<i class="las la-link"></i>
+{% elif name == 'session' %}
+<i class="las la-user"></i>
+{% elif name == 'ip' %}
+<i class="las la-globe"></i>
+{% elif name == 'data' %}
+<i class="las la-database"></i>
+{% elif name == 'file' %}
+<i class="las la-file"></i>
+{% elif name == 'files' %}
+<i class="las la-file"></i>
+{% elif name == 'expires_at' %}
+<i class="las la-calendar"></i>
+{% elif name == 'filename' %}
+<i class="las la-file"></i>
+{% elif name == 'size' %}
+<i class="las la-hdd"></i>
+{% elif name == 'uploaded_by' %}
+<i class="las la-user"></i>
+{% elif name == 'pdf' %}
+<i class="las la-file-pdf" style="color: #b10000 ;"></i>
+{% elif name == 'location' %}
+<i class="las la-map-marker"></i>
+{% elif name == 'website' %}
+<i class="las la-globe"></i>
+
+{% endif %}
+{% endmacro %}
+
+
+{% macro vertical_table(obj, columns) %}
+<div style="overflow-x: auto;">
+    <table class="vertical">
+        {% for column in columns %}
+        {% if obj[column] %}
+        <tr>
+            <th>{{ column | capitalize | replace('_', ' ') }}</th>
+            {% if column == 'value' %}
+            <td>{{ obj[column] | currency }}</td>
+            {% elif column == 'date' %}
+            <td>{{ obj[column] | human_readable_date }}</td>
+            {% elif column == 'notes' %}
+            <td>{{ obj[column] | markdown | safe }}</td>
+            {% elif column == 'notes_summary' %}
+            <td>{{ obj[column] | markdown | safe }}</td>
+            {% elif column == 'notes_summary_one_line' %}
+            <td>{{ obj[column] | markdown | safe }}</td>
+            {% elif column == 'email' %}
+            <td>{{ render_email_link(obj[column]) }}</td>
+            {% elif column == 'phone' %}
+            <td>{{ render_phone_link(obj[column]) }}</td>
+            {% elif is_user(obj[column]) %}
+            <td>{{ render_user_link(obj[column]) }}</td>
+            {% elif is_company(obj[column]) %}
+            <td>{{ render_company_link(obj[column]) }}</td>
+            {% elif is_contact(obj[column]) %}
+            <td><a href="{{ url_for('contacts_view', id=obj[column].id)}}">{{ obj[column].name }}</a></td>
+            {% else %}
+            <td>{{ obj[column] }}</td>
+            {% endif %}
+        </tr>
+        {% endif %}
+        {% endfor %}
+    </table>
+</div>
+{% endmacro %}

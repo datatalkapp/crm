@@ -1,0 +1,667 @@
+.panel {
+    float: left;
+    width: 200px;
+    padding: 10px;
+    height: 100vh;
+
+    h2 {
+        font-size: 0.8em;
+        margin-top: 40px;
+        margin-left: 5px;
+    }
+
+    a {
+        text-decoration: none;
+        display: block;
+
+        padding: 5px;
+
+        &:hover {
+            border-radius: 10px;
+        }
+    }
+
+    i {
+        margin-right: 10px;
+    }
+
+
+}
+
+.content {
+    .header {
+        min-height: 20px;
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        h1 {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            font-size: 1em;
+            margin: 0;
+            font-weight: normal;
+
+            i {
+                margin-right: 10px;
+            }
+        }
+
+        #search {
+            position: relative;
+            width: 50%;
+            justify-content: flex-ent;
+
+            input {
+                border: 1px solid;
+                border-radius: 15px;
+                padding: 5px;
+                margin-right: 10px;
+                margin-top: 18px;
+
+            }
+
+            #search-results {
+                position: absolute;
+                width: 100%;
+                /* Match the width of the search bar or adjust as needed */
+                z-index: 1000;
+                /* Ensure it stacks above other content */
+                /* or any color that fits your design */
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                /* Optional: adds a shadow for a "pop out" effect */
+                max-height: 300px;
+                /* or any value that suits your needs */
+                overflow-y: auto;
+                /* Allows scrolling within the div if content exceeds max-height */
+
+                a {
+                    border-radius: 10px;
+                    padding: 6px;
+                    text-decoration: none;
+                }
+
+            }
+        }
+    }
+
+    .pane {
+        border-radius: 10px;
+        border: 1px solid;
+        padding: 40px;
+        margin: 10px;
+        min-height: 100vh;
+        margin-left: 220px;
+
+        .buttons {
+            text-align: right;
+        }
+    }
+
+    .vertical {
+        overflow-x: none;
+
+        td {
+            white-space: wrap;
+        }
+    }
+
+    table {
+        border-collapse: collapse;
+        overflow-x: auto;
+        overflow-y: hidden;
+        width: 100%;
+
+        td:nth-child(2),
+        th:nth-child(2) {
+            width: 60%;
+        }
+
+
+        td {
+            border-width: 1px 0;
+            /* This sets top and bottom borders to 1px, left and right to 0 */
+            border-style: solid;
+            padding: 8px;
+            white-space: nowrap;
+
+            a {
+                border-radius: 10px;
+                padding: 6px;
+                text-decoration: none;
+                margin-top: 0px;
+            }
+
+
+        }
+
+        th {
+            padding: 8px;
+            text-align: left;
+            /* no wrap */
+            font-weight: bold;
+            white-space: nowrap;
+
+        }
+
+    }
+
+    .input {
+        position: relative;
+        margin-top: 10px;
+    }
+
+    input {
+        border: 1px solid;
+        border-radius: 5px;
+        padding: 5px;
+        margin-right: 10px;
+        margin-top: 18px;
+    }
+
+    textarea {
+        border: 1px solid;
+        border-radius: 5px;
+        padding: 5px;
+        margin-right: 10px;
+        margin-top: 18px;
+        width: 100%;
+        height: 100px;
+    }
+
+    select {
+        border: 1px solid;
+        border-radius: 5px;
+        padding: 5px;
+        margin-right: 10px;
+        margin-top: 18px;
+    }
+
+    label {
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        font-weight: bold;
+        font-size: 0.75em;
+    }
+}
+
+.focus {
+    border-width: 2px !important;
+    border-style: solid;
+}
+
+.btn {
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 5px;
+    padding: 5px;
+    text-decoration: none;
+    margin-right: 10px;
+    margin-top: 10px;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+    display: inline-block;
+    text-align: center;
+
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+}
+
+html {
+    margin: 0;
+    padding: 0;
+}
+
+
+.badge {
+    border-radius: 10px;
+    padding: 6px;
+    text-decoration: none;
+    margin-top: 0px;
+}
+
+.conversation {
+    height: 70vh;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    overflow-y: scroll;
+
+    .introduction {
+        h2 {
+            font-size: 3em;
+        }
+
+        .la-robot {
+            font-size: 4em;
+        }
+
+        p {
+            font-size: 1.2em;
+        }
+
+        .typing {
+            margin-left: 5px;
+        }
+    }
+
+
+    .message {
+        display: flex;
+
+        margin-bottom: 30px;
+
+        .user {
+            max-width: 50px;
+        }
+
+        .col {
+            flex: 1;
+            vertical-align: top;
+
+            i {
+                font-size: 2em;
+                margin-right: 10px;
+                margin-top: -5px;
+
+            }
+
+            .name {
+                font-weight: bold;
+            }
+
+            p {
+                line-height: 1.8em;
+            }
+        }
+    }
+
+}
+
+.prompt {
+    height: 10vh;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+
+    input {
+        width: 100%;
+        height: 30px;
+    }
+
+    button {
+        position: absolute;
+        right: -14px;
+        top: 15px;
+    }
+}
+
+
+@-webkit-keyframes rainbow {
+    0% {
+        background-position: 0% 82%
+    }
+
+    50% {
+        background-position: 100% 19%
+    }
+
+    100% {
+        background-position: 0% 82%
+    }
+}
+
+@-moz-keyframes rainbow {
+    0% {
+        background-position: 0% 82%
+    }
+
+    50% {
+        background-position: 100% 19%
+    }
+
+    100% {
+        background-position: 0% 82%
+    }
+}
+
+@-o-keyframes rainbow {
+    0% {
+        background-position: 0% 82%
+    }
+
+    50% {
+        background-position: 100% 19%
+    }
+
+    100% {
+        background-position: 0% 82%
+    }
+}
+
+@keyframes rainbow {
+    0% {
+        background-position: 0% 82%
+    }
+
+    50% {
+        background-position: 100% 19%
+    }
+
+    100% {
+        background-position: 0% 82%
+    }
+}
+
+.rainbows {
+    background: linear-gradient(124deg, #ff2400, #e81d1d, #e8b71d, #e3e81d, #1de840, #1ddde8, #2b1de8, #dd00f3, #dd00f3);
+    background-size: 1800% 1800%;
+    -webkit-animation: rainbow 5s ease infinite;
+    -z-animation: rainbow 5s ease infinite;
+    -o-animation: rainbow 5s ease infinite;
+    animation: rainbow 5s ease infinite;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+
+    a {
+        border-width: 1px;
+        border-style: solid;
+        border-radius: 5px;
+        padding: 5px;
+        text-decoration: none;
+        margin-right: 5px;
+        margin-left: 5px;
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+    }
+
+    .active {
+        border-width: 1px;
+        border-style: solid;
+        border-radius: 5px;
+        padding: 5px;
+        text-decoration: none;
+        margin-right: 5px;
+        margin-left: 5px;
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+    }
+
+
+}
+
+li {
+    list-style: none;
+}
+
+.search-indicator{
+    opacity:0;
+    transition: opacity 500ms ease-in;
+    font-size: 1.5em;
+}
+.htmx-request .search-indicator{
+    opacity:1
+}
+.htmx-request.search-indicator{
+    opacity:1
+}
+
+.user-link {
+    position: relative;
+}
+.image-icon-user {
+    width: 29px;
+    height: 29px;
+    border-radius: 10px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: #ffffff;
+
+}
+
+.user-name {
+    margin-left: 30px;
+}
+
+
+.company-link {
+    position: relative;
+}
+.image-icon-company {
+    width: 50px;
+    height: 29px;
+    border-radius: 10px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-size: 85%;
+    background-repeat: no-repeat;
+    background-position: center;
+    transition: background-size 0.3s ease; /* Transition effect */
+
+
+}
+.image-icon-company:hover {
+    background-size: 70%; /* Background size on hover */
+
+}
+
+.company-name {
+    margin-left: 50px
+}
+
+
+
+
+.contact-link {
+    position: relative;
+}
+.image-icon-contact {
+    width: 29px;
+    height: 29px;
+    border-radius: 10px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: #ffffff;
+
+}
+
+.contact-name {
+    margin-left: 30px;
+}
+
+
+
+
+.interaction-link {
+    position: relative;
+}
+
+.interaction-link {
+    text-decoration: none;
+    display: block;
+    padding: 5px;
+    border-radius: 10px;
+}
+.interaction-link i {
+    width: 29px;
+    height: 29px;
+    border-radius: 10px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: #ffffff;
+
+}
+
+
+.notification {
+    position: relative; /* Add this line */
+    margin-bottom: 20px;
+    border: grey;
+    background-color: white;
+    padding: 10px;
+    border-radius: 10px;
+  }
+
+
+#search-results {
+    li {
+        margin: 5px;
+        padding: 5px;
+    }
+}
+
+#search-results ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+#search-input {
+    width: 100%;
+}
+
+#search {
+    margin: auto;
+}
+
+.highlight {
+    font-weight: bold;
+    text-decoration: underline;
+
+}
+
+@font-face {
+    font-family: 'vcr';
+    src: url('./fonts/Daykids.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal
+}
+
+.logo {
+    font-family: 'vcr', sans-serif;
+    font-size: 2em;
+    margin-top: 20px;
+    margin-bottom: 40px;
+    margin-left:10px;
+}
+
+
+.login-logo {
+    font-family: 'vcr', sans-serif;
+    font-size: 2.5em;
+    color: #333; /* Adjust the color as needed */
+    text-align: center;
+    margin: 0 0 30px; /* Adjust bottom margin to create space between the logo and the first input field */
+}
+
+
+.center-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Make sure it takes the full viewport height */
+    width: 100vw; /* Ensure it spans the full viewport width */
+    position: absolute; /* Position it over the background */
+    top: 0;
+    left: 0;
+}
+
+.login-box {
+    margin: auto; /* Helps in centering */
+    padding: 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.9);
+    width: 100%;
+    max-width: 400px;
+    /* Removed flex-direction, justify-content, align-items */
+}
+
+
+.form-inner label {
+    display: block;
+    margin-bottom: 5px; /* Spacing between label and input */
+    font-weight: bold;
+}
+
+.form-inner input,
+.form-inner textarea,
+.form-inner select,
+.form-inner button {
+    margin-bottom: 20px; /* Spacing between fields */
+    width: calc(100% - 20px);
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.login-button-container {
+    padding-top: 10px; /* Add padding to the top */
+    width: 100%; /* Ensures the container spans the full width of the form */
+    display: flex;
+    justify-content: center; /* Centers the button within the container */
+}
+
+.form-inner input:last-child,
+.form-inner textarea:last-child,
+.form-inner select:last-child,
+.form-inner button:last-child {
+    margin-bottom: 0;
+}
+
+.login-page-background {
+    position: relative;
+    background-image: url('/static/images/login_background.webp');
+    background-size: cover;
+    background-position: center;
+    min-height: 100vh; /* Ensure it covers the full page */
+}
+
+.login-page-background::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.9); /* Adjust the transparency as needed */
+    z-index: -1; /* Ensure the overlay is behind the content */
+}
+
+.flash-messages-container {
+    text-align: center;
+  }
+  
+  .flash-message {
+    margin-bottom: 10px;
+  }
+

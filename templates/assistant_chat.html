@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+{% block title %}<i class="la la-comments"></i> Chat{% endblock %}
+{% block content %}
+<div class="chat">
+    <div class="conversation">
+        {% if conversation.messages %}
+        {% for message in conversation.messages %}
+        <div class="message">
+            <div class="col">
+                <i class="la la-user" style="background-color: darkorange"></i>
+            </div>
+            <div class="col">
+                <span class="name">{{ message.sender.name }}</span>
+                <p>{{ message.text }}</p>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <div class="introduction">
+            <i class="la la-robot rainbows"></i>
+            <h2>Hello again</h2>
+            <P>Ask any question about your documents.</P>
+            {% if documents %}
+            {% for document in documents %}
+            {% endfor %}
+            {% else %}
+            <a class="btn" href="{{ url_for('documents') }}"><i class="la la-external-link-alt"></i> Go to documents and
+                upload some!</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+    <div class="prompt">
+        <input type="text" id="messageInput" name="prompt" placeholder="Type your message here..." autocomplete="off">
+        <button id="sendMessage" class="btn"><i class="la la-paper-plane"></i></button>
+        <button id="stopAssistant" class="btn" style="display: none;"><i class="la la-stop"></i></button>
+    </div>
+    <script>
+        htmx.onLoad(function(elt) {
+            // set focus to the input field
+            document.getElementById('messageInput').focus();
+            var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
+
+            // Listen for the connection event
+            socket.on('connect', () => {
+
+                // Handle button click
+                document.getElementById('sendMessage').onclick = (e) => {
+                    e.preventDefault(); // Prevents default button click behavior
+                    // hide introduction
+                    document.querySelector('.introduction').style.display = 'none';
+                    let messageInput = document.getElementById('messageInput');
+                    let message = messageInput.value;
+                    socket.emit('send_message', { 'text': message , 'conversation_id': {{ conversation.id }} }); // Emitting a socket event
+                    messageInput.value = ''; // Clear the input after sending
+                    // disable input
+                    messageInput.disabled = true;
+                    // hide the send button
+                    document.getElementById('sendMessage').style.display = 'none';
+                    // show the stop button
+                    document.getElementById('stopAssistant').style.display = 'inline-block';
+                };
+
+                document.getElementById('messageInput').addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter' && !e.shiftKey) { // Checks if Enter is pressed without Shift
+                        e.preventDefault(); // Prevents the default behavior of the enter key
+                        document.getElementById('sendMessage').click(); // Triggers the send button click event
+                    }
+                });
+                
+                // handle stop click
+                document.getElementById('stopAssistant').onclick = (e) => {
+                    socket.emit('stop_assistant', { 'conversation_id': {{ conversation.id }} });
+                    // hide the stop button
+                    document.getElementById('stopAssistant').style.display = 'none';
+                    // show the send button
+                    document.getElementById('sendMessage').style.display = 'inline-block';
+                    // enable input
+                    document.getElementById('messageInput').disabled = false;
+                    document.getElementById('messageInput').focus();
+                }
+
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') { // Checks if ESC key is pressed
+                        document.getElementById('stopAssistant').click(); // Triggers the stopAssistant button click event
+                        // focus the input field
+                    }
+                });
+                
+
+            });
+
+            // Listen for incoming messages
+            socket.on('receive_message', data => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message';
+                messageDiv.id = data.uid; // Set the id of the div to the uid
+                const iconDiv = document.createElement('div');
+                iconDiv.className = 'col user';
+
+                // iif the user is the assistant, add a robot icon with .rainbows class
+                if (data.sender.toLowerCase().includes('assistant')) {
+                    const icon = document.createElement('i');
+                    icon.className = 'la la-robot rainbows';
+                    iconDiv.appendChild(icon);
+
+                }
+                
+                const textDiv = document.createElement('div');
+                textDiv.className = 'col';
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'name';
+                nameSpan.textContent = data.sender; // Set the user name
+                const messageP = document.createElement('p');
+                messageP.textContent = data.text; // Set the message text
+                // append an element to the <p> element which contains a chardet symbol, indicating that the assistant is typing the message
+                
+                const typingSpan = document.createElement('span');
+                typingSpan.className = 'typing';
+                typingSpan.textContent = '█';
+
+                // hide if the message is not from the assistant (if the word "assistant" is not part of the name, case insensitve)
+                if (!data.sender.toLowerCase().includes('assistant')) {
+                    typingSpan.style.display = 'none';
+                }
+
+                textDiv.appendChild(nameSpan);
+                textDiv.appendChild(messageP);
+                messageP.appendChild(typingSpan);
+                messageDiv.appendChild(iconDiv);
+                messageDiv.appendChild(textDiv);
+                // append the typing indicator to the message text
+                document.querySelector('.conversation').appendChild(messageDiv);
+            });
+
+
+            socket.on('receive_message_update', data => {
+                const messageDiv = document.getElementById(data.uid);
+                if (!messageDiv) return; // Exit if the message div is not found
+                const messageTextP = messageDiv.querySelector('p'); // Select the paragraph element for the message text
+                if (data.operation === 'append') {
+                    // replace newlines with <br> elements
+                    data.text = data.text.replace(/\n/g, '<br>');
+                    // preserve tabs by replacing them with 4 non-breaking spaces
+                    data.text = data.text.replace(/\t/g, '\u0009');
+
+                    // Create a temporary div to hold the HTML
+                    var tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = data.text;
+                    // Append the contents of the div to the messageTextP
+                    while (tempDiv.firstChild) {
+                        messageTextP.insertBefore(tempDiv.firstChild, messageTextP.querySelector('.typing'));
+                    }
+                
+                    // scroll to the bottom of the conversation
+                    document.querySelector('.conversation').scrollTo(0, document.querySelector('.conversation').scrollHeight);
+
+                } else if (data.operation == 'append_html') {
+                    // Create a temporary div to hold the HTML
+                    var tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = data.text;
+                    // Append the contents of the div to the messageTextP
+                    while (tempDiv.firstChild) {
+                        messageTextP.insertBefore(tempDiv.firstChild, messageTextP.querySelector('.typing'));
+                    }
+                    // scroll to the bottom of the conversation
+                    document.querySelector('.conversation').scrollTo(0, document.querySelector('.conversation').scrollHeight);
+                
+                } else if (data.operation === 'replace') {
+                    messageTextP.innerHTML = data.text; // Replace the entire message text
+                } else if (data.operation === 'done') {
+                    document.getElementById('messageInput').disabled = false; // Re-enable the message input
+                    document.getElementById('sendMessage').style.display = 'inline-block'; // Show the send button
+                    document.getElementById('stopAssistant').style.display = 'none'; // Hide the stop button
+                    document.getElementById('messageInput').focus(); // Focus the message input
+                    // hide the typing indicator
+                    const typingSpan = messageTextP.querySelector('.typing');
+                    typingSpan.style.display = 'none';
+                }
+            });
+            
+        });
+    </script>
+</div>
+{% endblock %}
