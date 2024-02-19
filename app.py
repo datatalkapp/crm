@@ -36,7 +36,7 @@ import numpy as np
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
 from flask_wtf import FlaskForm
-from wtforms.validators import DataRequired, EqualTo
+from wtforms.validators import DataRequired, EqualTo, Optional
 from wtforms.fields import (
     StringField,
     SubmitField,
@@ -45,6 +45,7 @@ from wtforms.fields import (
     TextAreaField,
     ColorField,
     FileField,
+    PasswordField,
 )
 from wtforms_sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
 
@@ -776,7 +777,7 @@ class OpportunityForm(FlaskForm):
 
 class LoginForm(FlaskForm):
     email = StringField("Email", validators=[DataRequired()])
-    password = StringField("Password", validators=[DataRequired()])
+    password = PasswordField("Password", validators=[DataRequired()])
     submit = SubmitField("Login")
 
 
@@ -817,8 +818,8 @@ class TaskForm(FlaskForm):
 class UserForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired()])
     email = StringField("Email", validators=[DataRequired()])
-    password = StringField("Password", validators=[DataRequired()])
-    password2 = StringField(
+    password = PasswordField("Password", validators=[DataRequired()])
+    password2 = PasswordField(
         "Password", validators=[DataRequired(), EqualTo("password")]
     )
     telegram_id = StringField("Telegram ID")
@@ -841,7 +842,7 @@ class UserForm(FlaskForm):
     assistant_description = TextAreaField("Assistant Description")
     assistant_example_prompts = TextAreaField("Assistant Example Prompts")
     image = FileField(
-        "Image", validators=[FileAllowed(["png"], "Only .png files allowed")]
+        "Image", validators=[FileAllowed(["png"], "Only .png files allowed"), Optional()]
     )
     submit = SubmitField("Save")
 
@@ -1701,23 +1702,29 @@ def users_new():
 def users_edit(id):
     user = User.query.get(id)
     form = UserForm(obj=user)
-
+    
     if form.validate_on_submit():
         user.name = form.name.data
         user.email = form.email.data
         user.telegram_id = form.telegram_id.data
+
         if form.password.data:
             user.set_password(form.password.data)
+        
         user.theme = form.theme.data
         user.is_assistant = form.is_assistant.data
         user.assistant_system_prompt = form.assistant_system_prompt.data
         user.assistant_actions = form.assistant_actions.data
         user.assistant_description = form.assistant_description.data
         user.assistant_example_prompts = form.assistant_example_prompts.data
-        user.upload_image(request.files["image"])
+        if request.files.get("image"):
+            user.upload_image(request.files["image"])
 
         db.session.commit()
         return redirect(url_for("view_list", object_name="users"))
+    
+    form.password.data = ""
+
     return render_template("form.html", form=form, url=url_for("users_edit", id=id))
 
 
