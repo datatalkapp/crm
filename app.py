@@ -2301,37 +2301,13 @@ def search():
 
 
 @app.route("/uploads/<path:filename>")
+@login_required
 def uploaded_file(filename):
-    print(app.config["UPLOAD_FOLDER"])
-    print(filename)
     return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
 
 
-# TODO: clean up
-@app.route("/chunks")
-def chunker():
-    files = File.query.all()
-
-    data = {}
-
-    for file_ in files:
-        if file_.file_type == "pdf":
-            data[file_.filename] = {}
-            data[file_.filename]["chunks"] = []
-            for chunk in file_.chunks:
-                data[file_.filename]["chunks"].append(
-                    {
-                        "text": chunk.text,
-                        "embeddings": [
-                            embedding.vector for embedding in chunk.embeddings
-                        ],
-                    }
-                )
-
-    return jsonify(data)
-
-
 @app.route("/timeline")
+@login_required
 def timeline():
     interactions = Interaction.query.order_by(Interaction.date.desc()).all()
     return render_template("timeline.html", interactions=interactions)
