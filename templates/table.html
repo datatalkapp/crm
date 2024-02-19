@@ -59,7 +59,7 @@
                     <td>{{ obj[column] | human_readable_size }}</td>
 
                     {% elif is_date(obj[column]) %}
-                    <td>{{ obj[column] | date }}</td>
+                    <td>{{ obj[column] | human_readable_date }}</td>
 
                     {% elif is_file(obj[column]) %}
                     <td><a href="{{ url_for('document', id=obj[column].id)}}">{{ obj[column].filename }}</a></td>

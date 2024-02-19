@@ -574,6 +574,13 @@ class Contact(BaseModel, HasImage):
 
     def __str__(self):
         return self.name
+    
+    @property
+    def last_interaction_at(self):
+        if self.interactions:
+            return self.interactions[-1].date
+        else:
+            return None
 
 
 class Task(BaseModel):
@@ -1110,7 +1117,7 @@ def view_table(object_name):
     page_details = {
         "companies": {"columns": ["name", "location", "website"], "model": Company},
         "contacts": {
-            "columns": ["name", "title", "email", "phone", "company", "tags"],
+            "columns": ["name", "title", "email", "phone", "company", "tags", "last_interaction_at"],
             "model": Contact,
         },
         "interactions": {
