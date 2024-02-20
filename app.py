@@ -1,92 +1,40 @@
-from flask import (
-    Flask,
-    render_template,
-    redirect,
-    url_for,
-    flash,
-    request,
-    jsonify,
-    Response,
-)
-from flask import (
-    Flask,
-    render_template,
-    redirect,
-    url_for,
-    flash,
-    request,
-    jsonify,
-    Response,
-    send_from_directory,
-    abort,
-)
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from flask_login import (
-    LoginManager,
-    UserMixin,
-    login_user,
-    login_required,
-    logout_user,
-    current_user,
-)
-from multiprocessing import Process
-import numpy as np
-
-from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime, timedelta
-from flask_wtf import FlaskForm
-from wtforms.validators import DataRequired, EqualTo, Optional
-from wtforms.fields import (
-    StringField,
-    SubmitField,
-    BooleanField,
-    DateField,
-    TextAreaField,
-    ColorField,
-    FileField,
-    PasswordField,
-)
-from wtforms_sqlalchemy.fields import QuerySelectField, QuerySelectMultipleField
-
+import email
 import hashlib
-
-from werkzeug.utils import secure_filename
-from sqlalchemy.dialects import sqlite
-
-import requests
-import os
-
-from wtforms import SelectField
+import imaplib
 import json
-import re
-
-from flask import Flask, request, Response, render_template
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.dialects import sqlite
-from werkzeug.security import check_password_hash, generate_password_hash
-from flask_migrate import Migrate
-
-from sqlalchemy import func
-
 import os
-
-
-from flask_cors import CORS
-from flask_socketio import SocketIO, emit
-from flask import redirect, url_for
+import re
+from datetime import datetime, timedelta
+from email.header import decode_header
 from functools import wraps
-
-from flask_login import current_user
-from functools import wraps
-from flask_socketio import disconnect
-import shutil
-
-from dotenv import load_dotenv
-
+from multiprocessing import Process
+from time import sleep
 from uuid import uuid4
 
-from sqlalchemy import event
+import numpy as np
+import requests
+from bs4 import BeautifulSoup
+from dotenv import load_dotenv
+from flask import (Flask, Response, abort, flash, jsonify, redirect,
+                   render_template, request, send_from_directory, url_for)
+from flask_cors import CORS
+from flask_login import (LoginManager, UserMixin, current_user, login_required,
+                         login_user, logout_user)
+from flask_migrate import Migrate
+from flask_socketio import SocketIO, disconnect, emit
+from flask_sqlalchemy import SQLAlchemy
+from flask_wtf import FlaskForm
+from sqlalchemy import event, func
+from sqlalchemy.dialects import sqlite
+from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.utils import secure_filename
+from wtforms import SelectField
+from wtforms.fields import (BooleanField, ColorField, DateField, FileField,
+                            PasswordField, StringField, SubmitField,
+                            TextAreaField)
+from wtforms.validators import DataRequired, EqualTo, Optional
+from wtforms_sqlalchemy.fields import (QuerySelectField,
+                                       QuerySelectMultipleField)
 
 load_dotenv()
 
@@ -96,7 +44,7 @@ socketio = SocketIO(app)
 CORS(app, resources={r"/e": {"origins": "*"}})
 
 
-database_path = os.path.join(os.getcwd(), 'data', 'database.sqlite')
+database_path = os.path.join(os.getcwd(), "data", "database.sqlite")
 app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{database_path}"
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
 app.config["UPLOAD_FOLDER"] = "./data/uploads"
@@ -187,9 +135,10 @@ themes = {
 
 @app.after_request
 def set_cache_header(response):
-    if request.path.startswith('/static'):
-        response.headers['Cache-Control'] = 'public, max-age=31536000'  # 1 year
+    if request.path.startswith("/static"):
+        response.headers["Cache-Control"] = "public, max-age=31536000"  # 1 year
     return response
+
 
 @app.context_processor
 def inject_theme():
@@ -369,9 +318,6 @@ def query_openai(messages, json_mode=False):
     return response.json()
 
 
-
-
-
 def get_openai_embedding(text):
     api_url = "https://api.openai.com/v1/embeddings"
     headers = {
@@ -449,8 +395,6 @@ class BaseModel(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-
 
 
 class HasImage:
@@ -575,7 +519,7 @@ class Contact(BaseModel, HasImage):
 
     def __str__(self):
         return self.name
-    
+
     @property
     def last_interaction_at(self):
         if self.interactions:
@@ -597,8 +541,6 @@ class Task(BaseModel):
 
     def __repr__(self):
         return f"<Task {self.name}>"
-
-
 
 
 def task_insert_listener(mapper, connection, target):
@@ -842,7 +784,8 @@ class UserForm(FlaskForm):
     assistant_description = TextAreaField("Assistant Description")
     assistant_example_prompts = TextAreaField("Assistant Example Prompts")
     image = FileField(
-        "Image", validators=[FileAllowed(["png"], "Only .png files allowed"), Optional()]
+        "Image",
+        validators=[FileAllowed(["png"], "Only .png files allowed"), Optional()],
     )
     submit = SubmitField("Save")
 
@@ -1043,7 +986,6 @@ def login():
 
         if not user:
             flash("Invalid email or password")
-            print("Invalid email or password")
             return render_template("login.html", form=form)
 
         if user and user.check_password(form.password.data):
@@ -1051,7 +993,6 @@ def login():
             return redirect(url_for("dashboard"))
         else:
             flash("Invalid email or password")
-            print("Invalid email or password")
             return render_template("login.html", form=form)
 
     return render_template("login.html", form=form)
@@ -1118,7 +1059,15 @@ def view_table(object_name):
     page_details = {
         "companies": {"columns": ["name", "location", "website"], "model": Company},
         "contacts": {
-            "columns": ["name", "title", "email", "phone", "company", "tags", "last_interaction_at"],
+            "columns": [
+                "name",
+                "title",
+                "email",
+                "phone",
+                "company",
+                "tags",
+                "last_interaction_at",
+            ],
             "model": Contact,
         },
         "interactions": {
@@ -1702,7 +1651,7 @@ def users_new():
 def users_edit(id):
     user = User.query.get(id)
     form = UserForm(obj=user)
-    
+
     if form.validate_on_submit():
         user.name = form.name.data
         user.email = form.email.data
@@ -1710,7 +1659,7 @@ def users_edit(id):
 
         if form.password.data:
             user.set_password(form.password.data)
-        
+
         user.theme = form.theme.data
         user.is_assistant = form.is_assistant.data
         user.assistant_system_prompt = form.assistant_system_prompt.data
@@ -1722,7 +1671,7 @@ def users_edit(id):
 
         db.session.commit()
         return redirect(url_for("view_list", object_name="users"))
-    
+
     form.password.data = ""
 
     return render_template("form.html", form=form, url=url_for("users_edit", id=id))
@@ -1895,6 +1844,7 @@ def document(id):
     print(file_.filename)
     return send_from_directory(app.config["UPLOAD_FOLDER"], file_.filename)
 
+
 @app.route("/documents/file")
 @login_required
 def file():
@@ -2009,6 +1959,7 @@ def share_file(id):
 @login_required
 def shared_documents():
     return render_template("shared_files.html")
+
 
 @app.route("/assistant/<int:id>/chat")
 @login_required
@@ -2318,3 +2269,195 @@ def uploaded_file(filename):
 def timeline():
     interactions = Interaction.query.order_by(Interaction.date.desc()).all()
     return render_template("timeline.html", interactions=interactions)
+
+
+def inbound_email_handler():
+    while True:
+        print("Processing emails...")
+
+        # Login to IMAP server
+        mail = imaplib.IMAP4_SSL(os.environ.get("IMAP_SERVER"))
+        username = os.environ.get("IMAP_USERNAME")
+        password = os.environ.get("IMAP_PASSWORD")
+        mail.login(username, password)
+
+        # Select the inbox
+        mail.select("inbox")
+
+        # Search for all messages
+        status, messages = mail.search(None, "ALL")
+        messages = messages[0].split()
+
+        # Function to decode the email headers
+        def decode_mime_words(s):
+            return "".join(
+                word.decode(encoding or "utf-8") if isinstance(word, bytes) else word
+                for word, encoding in decode_header(s)
+            )
+
+        # Function to safely decode a payload
+        def safe_decode(payload, default_charset="utf-8"):
+            try:
+                return payload.decode("utf-8")
+            except UnicodeDecodeError:
+                try:
+                    return payload.decode(default_charset)
+                except UnicodeDecodeError:
+                    return payload.decode("utf-8", errors="ignore")
+
+        bodies = []
+
+        for mail_id in messages:
+            status, data = mail.fetch(mail_id, "(RFC822)")
+            raw_email = data[0][1]
+            msg = email.message_from_bytes(raw_email)
+
+            # Process headers
+            from_ = decode_mime_words(msg.get("From"))
+            to = decode_mime_words(msg.get("To"))
+            subject = decode_mime_words(msg.get("Subject"))
+
+            # archive the mail
+            mail.store(mail_id, "+FLAGS", "\\Deleted")
+
+            if msg.is_multipart():
+                for part in msg.walk():
+                    content_type = part.get_content_type()
+                    content_disposition = str(part.get("Content-Disposition"))
+
+                    if (
+                        content_type == "text/plain"
+                        and "attachment" not in content_disposition
+                    ):
+                        payload = part.get_payload(decode=True)
+                        charset = part.get_content_charset("utf-8")  # Fallback to utf-8
+                        body = safe_decode(payload, charset)
+                        bodies.append(body)
+
+                    elif content_type == "text/html":
+                        payload = part.get_payload(decode=True)
+                        charset = part.get_content_charset("utf-8")  # Fallback to utf-8
+                        html_content = safe_decode(payload, charset)
+                        soup = BeautifulSoup(html_content, "html.parser")
+                        text = soup.get_text()
+                        bodies.append(text)
+            else:
+                payload = msg.get_payload(decode=True)
+                charset = msg.get_content_charset("utf-8")  # Fallback to utf-8
+                if msg.get_content_type() == "text/html":
+                    html_content = safe_decode(payload, charset)
+                    soup = BeautifulSoup(html_content, "html.parser")
+                    text = soup.get_text()
+                    bodies.append(text)
+                else:
+                    body = safe_decode(payload, charset)
+                    bodies.append(body)
+
+        parsed_bodies = []
+
+        for body in bodies:
+            # remove empty lines (only spaces) from bodies
+            parsed_body = ""
+            for line in body.splitlines():
+                if line.strip() != "":
+                    parsed_body += line + "\n"
+
+            parsed_bodies.append(parsed_body)
+
+        def query_openai(messages, json_mode=False):
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {os.environ.get('OPENAI_API_KEY')}",
+            }
+            data = {"model": "gpt-4-turbo-preview", "messages": messages}
+
+            if json_mode:
+                data["response_format"] = {"type": "json_object"}
+
+            response = requests.post(
+                "https://api.openai.com/v1/chat/completions", json=data, headers=headers
+            )
+            return response.json()
+
+        jsons = []
+
+        for message in parsed_bodies:
+            system_prompt = """
+        The user will give you an e-mail body. You should extract the sender contact information from the e-mail and return it in the following JSON format:
+
+        {
+        "contact_name": "<name here>",
+        "company_name": "<name here>",
+        "phone": "<phone here>",
+        "email": "<email here>",
+        "address": "<address here>",
+        "website": "<website here>"
+        "interaction_date", "<date here as DD-MM-YYYY>",
+        "interaction_summary": "<summary here>",
+        "interaction_one_liner": "<one liner here>"
+        }
+
+        Only respond with JSON, nothing else.
+                """
+            user_prompt = message
+
+            messages = [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt},
+            ]
+
+            response = query_openai(messages, json_mode=True)
+
+            try:
+                data = response["choices"][0]["message"]["content"]
+            except KeyError:
+                print(response)
+
+            import json
+
+            try:
+                jsons.append(json.loads(data))
+            except:
+                print(data)
+
+        for row in jsons:
+            with app.app_context():
+                # check if contact exists
+                contact = Contact.query.filter_by(email=row["email"]).first()
+                # if not contact, create it
+                if not contact:
+                    contact = Contact()
+                    contact.name = row["contact_name"]
+                    contact.email = row["email"]
+                    contact.phone = row["phone"]
+                    contact.company = Company.query.filter_by(
+                        name=row["company_name"]
+                    ).first()
+                    # if not company, create it
+                    if not contact.company:
+                        contact.company = Company(name=row["company_name"])
+                        db.session.add(contact.company)
+                        db.session.commit()
+
+                    db.session.add(contact)
+                    db.session.commit()
+
+                # create interaction
+                interaction = Interaction()
+                interaction.contact = contact
+                interaction.date = datetime.strptime(
+                    row["interaction_date"], "%d-%m-%Y"
+                )
+                interaction.notes_summary = row["interaction_summary"]
+                interaction.notes_summary_one_line = row["interaction_one_liner"]
+                db.session.add(interaction)
+
+                db.session.commit()
+
+                print(f"Created interaction for {contact.name} on {interaction.date}")
+
+        sleep(60 * 5)
+
+
+inbound_email_handler_process = Process(target=inbound_email_handler)
+inbound_email_handler_process.start()
